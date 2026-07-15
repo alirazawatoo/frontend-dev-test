@@ -1,6 +1,6 @@
-import { memo } from 'react';
+import { memo, useId } from 'react';
 import { Field, Select, Textarea } from '../../components';
-import { RETURN_REASONS, useFieldId } from '../../lib';
+import { RETURN_REASONS } from '../../lib';
 import type { ReturnDraft } from '../../types';
 
 type StepReasonProps = {
@@ -18,12 +18,12 @@ export const StepReason = memo(function StepReason({
   onReasonChange,
   onCommentChange,
 }: StepReasonProps) {
-  const reasonId = useFieldId();
-  const commentId = useFieldId();
+  const reasonId = useId();
+  const commentId = useId();
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label="Reason for return" htmlFor={reasonId} error={undefined}>
+      <Field label="Reason for return" htmlFor={reasonId}>
         <Select
           id={reasonId}
           value={draft.reason}

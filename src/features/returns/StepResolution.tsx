@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { RESOLUTION_OPTIONS, resolutionAmountCents, returnedValueCents, storeCreditBonusCents, formatMoney } from '../../lib';
 import type { Order, ReturnDraft, ReturnResolution } from '../../types';
 
@@ -18,10 +18,7 @@ export const StepResolution = memo(function StepResolution({
   onResolutionChange,
 }: StepResolutionProps) {
   const returnableItems = order.items.filter((item) => item.returnEligible);
-  const returnedValue = useMemo(
-    () => returnedValueCents(returnableItems, draft.selections),
-    [returnableItems, draft.selections],
-  );
+  const returnedValue = returnedValueCents(returnableItems, draft.selections);
 
   return (
     <fieldset className="space-y-3">

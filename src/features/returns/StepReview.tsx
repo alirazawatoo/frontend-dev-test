@@ -1,7 +1,12 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { ItemThumb } from '../../components';
-import { formatMoney, lineTotalCents, resolutionAmountCents, returnedValueCents } from '../../lib';
-import { RESOLUTION_OPTIONS } from '../../lib';
+import {
+  RESOLUTION_OPTIONS,
+  formatMoney,
+  lineTotalCents,
+  resolutionAmountCents,
+  returnedValueCents,
+} from '../../lib';
 import type { Order, ReturnDraft } from '../../types';
 
 type StepReviewProps = {
@@ -16,11 +21,10 @@ type StepReviewProps = {
 export const StepReview = memo(function StepReview({ order, draft }: StepReviewProps) {
   const returnableItems = order.items.filter((item) => item.returnEligible);
   const selectedItems = returnableItems.filter((item) => (draft.selections[item.id] ?? 0) > 0);
-  const returnedValue = useMemo(
-    () => returnedValueCents(returnableItems, draft.selections),
-    [returnableItems, draft.selections],
-  );
-  const resolutionAmount = resolutionAmountCents(returnedValue, draft.resolution!);
+  const returnedValue = returnedValueCents(returnableItems, draft.selections);
+  const resolutionAmount = draft.resolution
+    ? resolutionAmountCents(returnedValue, draft.resolution)
+    : returnedValue;
 
   const resolutionLabel =
     RESOLUTION_OPTIONS.find((r) => r.value === draft.resolution)?.title ?? '—';

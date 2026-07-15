@@ -1,6 +1,5 @@
 import {
   forwardRef,
-  useId,
   type ReactNode,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
@@ -51,9 +50,3 @@ export const Textarea = forwardRef<
   <textarea ref={ref} className={cn(controlClasses, 'resize-y', className)} {...props} />
 ));
 Textarea.displayName = 'Textarea';
-
-/** Convenience: generate a stable id when a caller doesn't supply one. */
-export function useFieldId(provided?: string): string {
-  const generated = useId();
-  return provided ?? generated;
-}
