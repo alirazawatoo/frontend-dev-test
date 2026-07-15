@@ -65,7 +65,7 @@ const ItemRow = memo(function ItemRow({ item, selectedQty, onQuantityChange }: I
     <li className="flex flex-wrap items-center gap-3">
       <ItemThumb name={item.name} color={item.thumbColor} />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-ink">{item.name}</p>
+        <p className="break-words font-medium text-ink">{item.name}</p>
         <p className="text-sm text-muted">
           {formatMoney(item.unitPriceCents)} each · {item.quantity} ordered
         </p>
