@@ -1,0 +1,28 @@
+/* solvpath brand tokens — drop in and reference these variables, or map into your theme. */
+:root {
+  /* Primary (deep navy) — primary buttons & chrome; use white text on it */
+  --brand: #0E2C3E;
+  --brand-hover: #17394E;
+  --brand-soft: #E7F0F3;
+
+  /* Accent (teal) — active states, focus, selection, highlights */
+  --accent: #28B0C8;
+  --accent-deep: #0C6E80; /* use for teal text / links (contrast-safe on white) */
+  --accent-soft: #E4F5F8;
+
+  /* Neutrals */
+  --ink: #0B2430;      /* body text        */
+  --muted: #566671;    /* secondary text   */
+  --line: #E2E8EB;     /* borders/dividers */
+  --canvas: #F4F7F9;   /* page background  */
+  --surface: #FFFFFF;  /* cards            */
+
+  /* Status (text + soft background) */
+  --success: #127A3B;  --success-soft: #E7F7ED; /* delivered   */
+  --info: #1D4ED8;     --info-soft: #E7EEFF;    /* in transit  */
+  --warning: #B45309;  --warning-soft: #FBF0DE; /* processing  */
+  --danger: #B91C1C;   --danger-soft: #FCEBEB;  /* cancelled   */
+
+  --radius-card: 16px;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
