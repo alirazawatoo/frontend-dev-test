@@ -142,7 +142,7 @@ describe('lib/money', () => {
     it('rounds store_credit bonus correctly', () => {
       // 10003 * 1.10 = 11003.3 -> rounds to 11003
       expect(resolutionAmountCents(10003, 'store_credit')).toBe(11003);
-      // 10005 * 1.10 = 11005.5 -> rounds to 11006 (banker's rounding)
+      // 10005 * 1.10 = 11005.5 -> rounds half up to 11006
       expect(resolutionAmountCents(10005, 'store_credit')).toBe(11006);
     });
 
