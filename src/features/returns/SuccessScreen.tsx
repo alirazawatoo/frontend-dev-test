@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
-import { Button } from '../../components';
+import { ButtonLink } from '../../components';
 import type { ReturnReceipt } from '../../types';
 
 type SuccessScreenProps = {
@@ -27,11 +26,7 @@ export function SuccessScreen({ receipt }: SuccessScreenProps) {
         <p className="font-mono text-sm font-semibold text-ink">{receipt.returnId}</p>
       </div>
 
-      <Button asChild={false} onClick={undefined}>
-        <Link to="/" className="contents">
-          Back to orders
-        </Link>
-      </Button>
+      <ButtonLink to="/">Back to orders</ButtonLink>
     </div>
   );
 }

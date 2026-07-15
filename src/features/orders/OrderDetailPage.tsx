@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { Button, ErrorState, ItemThumb, Skeleton } from '../../components';
+import { ButtonLink, ErrorState, ItemThumb, Skeleton } from '../../components';
 import { useOrder } from '../../hooks';
 import { formatDate, formatMoney, lineTotalCents, orderTotalCents } from '../../lib';
 import type { Order } from '../../types';
@@ -53,12 +53,10 @@ function OrderDetail({ order }: { order: Order }) {
           <p className="mt-1 text-sm text-muted">Placed {formatDate(order.placedAt)}</p>
         </div>
         {canReturn && (
-          <Button asChild={false} className="shrink-0" onClick={undefined}>
-            <Link to={`/orders/${order.id}/return`} className="contents">
-              <RotateCcw className="size-4" aria-hidden />
-              Return or exchange
-            </Link>
-          </Button>
+          <ButtonLink to={`/orders/${order.id}/return`} className="shrink-0">
+            <RotateCcw className="size-4" aria-hidden />
+            Return or exchange
+          </ButtonLink>
         )}
       </header>
 
