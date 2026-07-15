@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, Outlet } from 'react-router-dom';
+import { createBrowserRouter, Link, Outlet } from 'react-router-dom';
 import { Spinner } from '../components';
 import { OrdersPage, OrderDetailPage } from '../features/orders';
 
@@ -14,13 +14,13 @@ function Layout() {
     <div className="flex flex-col min-h-screen bg-canvas">
       <header className="border-b border-line bg-surface px-4 py-4 sm:px-6">
         <div className="mx-auto max-w-4xl">
-          <a href="/" className="inline-block">
+          <Link to="/" className="inline-block">
             <img
               src="/solvpath-logo.png"
-              alt="solvpath"
+              alt="solvpath home"
               className="h-7 w-auto"
             />
-          </a>
+          </Link>
         </div>
       </header>
 

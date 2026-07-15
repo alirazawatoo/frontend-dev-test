@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { PackageSearch } from 'lucide-react';
 import { Button, EmptyState, ErrorState } from '../../components';
 import { useDebouncedValue, useOrders } from '../../hooks';
@@ -14,14 +14,14 @@ import { StatusFilterSelect } from './StatusFilterSelect';
 export function OrdersPage() {
   const [status, setStatus] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
 
-  // Any change to the filters should bring the shopper back to the first page.
-  useEffect(() => {
-    setPage(1);
-  }, [status, debouncedSearch]);
+  // The page belongs to one filter combination. Deriving it (instead of
+  // resetting it in an effect) avoids fetching page N of the new results
+  // for one render before snapping back to page 1.
+  const filterKey = `${status}|${debouncedSearch}`;
+  const [pageState, setPageState] = useState({ filterKey, page: 1 });
+  const page = pageState.filterKey === filterKey ? pageState.page : 1;
 
   const { data, isLoading, isError, error, refetch, isFetching, isPlaceholderData } =
     useOrders({
@@ -39,10 +39,13 @@ export function OrdersPage() {
     setSearch('');
   }, []);
 
-  const handlePageChange = useCallback((next: number) => {
-    setPage(next);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  const handlePageChange = useCallback(
+    (next: number) => {
+      setPageState({ filterKey, page: next });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [filterKey],
+  );
 
   const content = useMemo(() => {
     if (isLoading) return <OrdersSkeleton />;
