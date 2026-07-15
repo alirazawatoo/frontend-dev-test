@@ -1,94 +1,92 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button, ErrorState, Spinner, Stepper } from '../../components';
 import { useOrder, useReturnDraft, useSubmitReturn } from '../../hooks';
-import { cn, returnedValueCents } from '../../lib';
-import type { ReturnRequest, ReturnStep } from '../../types';
+import type { Order, ReturnDraft, ReturnRequest, ReturnStep } from '../../types';
 import { StepSelectItems } from './StepSelectItems';
 import { StepReason } from './StepReason';
 import { StepResolution } from './StepResolution';
 import { StepReview } from './StepReview';
 import { SuccessScreen } from './SuccessScreen';
 
+const STEPS: { key: ReturnStep; label: string; blockedHint: string }[] = [
+  { key: 'items', label: 'Items', blockedHint: 'Choose at least one item to continue.' },
+  { key: 'reason', label: 'Reason', blockedHint: 'Pick a reason to continue.' },
+  { key: 'resolution', label: 'Resolution', blockedHint: 'Choose how you would like to be refunded.' },
+  { key: 'review', label: 'Review', blockedHint: '' },
+];
+
+function isStepComplete(step: ReturnStep, draft: ReturnDraft): boolean {
+  switch (step) {
+    case 'items':
+      return Object.values(draft.selections).some((qty) => qty > 0);
+    case 'reason':
+      return draft.reason !== '';
+    case 'resolution':
+    case 'review':
+      return draft.resolution !== null;
+  }
+}
+
+function toReturnRequest(order: Order, draft: ReturnDraft): ReturnRequest | null {
+  if (!draft.resolution) return null;
+  return {
+    orderId: order.id,
+    items: Object.entries(draft.selections)
+      .filter(([, qty]) => qty > 0)
+      .map(([itemId, quantity]) => ({ itemId, quantity })),
+    reason: draft.reason,
+    resolution: draft.resolution,
+    comment: draft.comment.trim() || undefined,
+  };
+}
+
+function BackToOrders({ to = '/', label = 'Back to orders' }: { to?: string; label?: string }) {
+  return (
+    <Link
+      to={to}
+      className="inline-flex items-center gap-1 text-sm font-medium text-accent-deep hover:underline"
+    >
+      <ArrowLeft className="size-4" aria-hidden />
+      {label}
+    </Link>
+  );
+}
+
 /**
  * Guided multi-step return flow: select items → reason → resolution → review → submit.
- * All state is tracked in the draft; on submit it's mapped to a ReturnRequest.
+ * The step index is explicit state; each step only gates the Next button, so
+ * going back never discards what the shopper already entered.
  */
 export function ReturnFlowPage() {
   const { orderId } = useParams<{ orderId: string }>();
-  const { data: order, isLoading, isError, error } = useOrder(orderId);
+  const { data: order, isLoading, isError, error, refetch, isFetching } = useOrder(orderId);
+  const { draft, setQuantity, setReason, setComment, setResolution } = useReturnDraft();
+  const submission = useSubmitReturn();
+  const [stepIndex, setStepIndex] = useState(0);
 
-  const draft = useReturnDraft();
-  const {
-    mutate: submit,
-    isPending: isSubmitting,
-    isError: submitError,
-    error: submitErrorValue,
-    data: receipt,
-  } = useSubmitReturn();
+  const step = STEPS[stepIndex];
+  const canAdvance = isStepComplete(step.key, draft);
 
-  const currentStep = useMemo<ReturnStep | null>(() => {
-    if (!draft.draft.selections || Object.keys(draft.draft.selections).length === 0)
-      return 'items';
-    if (!draft.draft.reason) return 'reason';
-    if (!draft.draft.resolution) return 'resolution';
-    return 'review';
-  }, [draft.draft]);
+  // Move focus to the step heading after Next/Back so screen-reader and
+  // keyboard users land on the new content instead of a vanished button.
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const hasNavigated = useRef(false);
+  useEffect(() => {
+    if (hasNavigated.current) headingRef.current?.focus();
+  }, [stepIndex]);
 
-  const steps: { key: ReturnStep; label: string }[] = [
-    { key: 'items', label: 'Items' },
-    { key: 'reason', label: 'Reason' },
-    { key: 'resolution', label: 'Resolution' },
-    { key: 'review', label: 'Review' },
-  ];
-
-  const currentStepIndex = steps.findIndex((s) => s.key === currentStep);
-  const isCurrentStepValid = currentStep === 'review' && draft.draft.resolution !== null;
-
-  const handleNext = useCallback(() => {
-    if (currentStepIndex < steps.length - 1) {
-      // just move to the next step; form fields handle their own validation hints
-    }
-  }, [currentStepIndex, steps.length]);
+  const goTo = useCallback((index: number) => {
+    hasNavigated.current = true;
+    setStepIndex(index);
+  }, []);
 
   const handleSubmit = useCallback(() => {
-    if (!order || !isCurrentStepValid) return;
-
-    const returnableItems = order.items.filter((item) => item.returnEligible);
-    returnedValueCents(returnableItems, draft.draft.selections);
-
-    const request: ReturnRequest = {
-      orderId: order.id,
-      items: Object.entries(draft.draft.selections)
-        .filter(([, qty]) => qty > 0)
-        .map(([itemId, quantity]) => ({ itemId, quantity })),
-      reason: draft.draft.reason,
-      resolution: draft.draft.resolution!,
-      comment: draft.draft.comment || undefined,
-    };
-
-    submit(request);
-  }, [order, draft.draft, submit, isCurrentStepValid]);
-
-  // Early return if the order wasn't found or isn't delivered.
-  if (!isLoading && (!order || order.status !== 'delivered')) {
-    return (
-      <section className="space-y-6">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-sm font-medium text-accent-deep hover:underline"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Back to orders
-        </Link>
-        <ErrorState
-          title="Can't start a return"
-          error={new Error('This order is not eligible for returns.')}
-        />
-      </section>
-    );
-  }
+    if (!order || submission.isPending) return;
+    const request = toReturnRequest(order, draft);
+    if (request) submission.mutate(request);
+  }, [order, draft, submission]);
 
   if (isLoading) {
     return (
@@ -98,133 +96,112 @@ export function ReturnFlowPage() {
     );
   }
 
-  if (isError) {
+  if (isError || !order) {
     return (
       <section className="space-y-6">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-sm font-medium text-accent-deep hover:underline"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Back to orders
-        </Link>
+        <BackToOrders />
         <ErrorState
           title="We couldn't load that order"
           error={error}
+          onRetry={() => void refetch()}
+          retrying={isFetching}
         />
       </section>
     );
   }
 
-  // Success screen
-  if (receipt) {
+  if (order.status !== 'delivered') {
     return (
       <section className="space-y-6">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-sm font-medium text-accent-deep hover:underline"
-        >
-          <ArrowLeft className="size-4" aria-hidden />
-          Back to orders
-        </Link>
-        <SuccessScreen receipt={receipt} />
+        <BackToOrders to={`/orders/${order.id}`} label="Back to order" />
+        <ErrorState
+          title="Can't start a return"
+          error={new Error('Returns open once an order has been delivered.')}
+        />
       </section>
     );
   }
 
+  if (submission.data) {
+    return (
+      <section className="space-y-6">
+        <BackToOrders />
+        <SuccessScreen receipt={submission.data} />
+      </section>
+    );
+  }
+
+  const isLastStep = stepIndex === STEPS.length - 1;
+
   return (
     <section className="space-y-6">
-      <Link
-        to={`/orders/${orderId}`}
-        className="inline-flex items-center gap-1 text-sm font-medium text-accent-deep hover:underline"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        Back to order
-      </Link>
+      <BackToOrders to={`/orders/${order.id}`} label="Back to order" />
 
       <div>
         <h1 className="text-2xl font-semibold text-ink">Return or exchange</h1>
         <p className="mt-1 text-sm text-muted">
-          We'll guide you through the return process.
+          Order {order.orderNumber} · we'll guide you through it in four short steps.
         </p>
       </div>
 
-      <Stepper steps={steps} currentIndex={currentStepIndex} />
+      <Stepper steps={STEPS} currentIndex={stepIndex} />
 
-      {/* Step content */}
-      <div
-        className={cn(
-          'rounded-card border border-line bg-surface p-6',
-          submitError && 'ring-1 ring-danger',
+      <div className="rounded-card border border-line bg-surface p-4 sm:p-6">
+        <h2
+          ref={headingRef}
+          tabIndex={-1}
+          className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted focus:outline-none"
+        >
+          Step {stepIndex + 1} of {STEPS.length}: {step.label}
+        </h2>
+        {step.key === 'items' && (
+          <StepSelectItems order={order} draft={draft} onQuantityChange={setQuantity} />
         )}
-      >
-        {currentStep === 'items' && order && (
-          <StepSelectItems
-            order={order}
-            draft={draft.draft}
-            onQuantityChange={draft.setQuantity}
-          />
+        {step.key === 'reason' && (
+          <StepReason draft={draft} onReasonChange={setReason} onCommentChange={setComment} />
         )}
-        {currentStep === 'reason' && (
-          <StepReason
-            draft={draft.draft}
-            onReasonChange={draft.setReason}
-            onCommentChange={draft.setComment}
-          />
+        {step.key === 'resolution' && (
+          <StepResolution order={order} draft={draft} onResolutionChange={setResolution} />
         )}
-        {currentStep === 'resolution' && order && (
-          <StepResolution
-            order={order}
-            draft={draft.draft}
-            onResolutionChange={draft.setResolution}
-          />
-        )}
-        {currentStep === 'review' && order && <StepReview order={order} draft={draft.draft} />}
+        {step.key === 'review' && <StepReview order={order} draft={draft} />}
       </div>
 
-      {submitError && (
+      {submission.isError && (
         <ErrorState
           title="We couldn't process your return"
-          error={submitErrorValue}
+          error={submission.error}
           onRetry={handleSubmit}
-          retrying={isSubmitting}
+          retrying={submission.isPending}
         />
       )}
 
-      {/* Navigation */}
-      <div className="flex gap-3">
-        {currentStepIndex > 0 && (
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+        {stepIndex > 0 && (
           <Button
             variant="secondary"
-            onClick={() => {
-              // Move back by unsetting the field(s) that determine the current step.
-              if (currentStep === 'reason') draft.setQuantity('', 0); // clears selections
-              else if (currentStep === 'resolution') draft.setReason('');
-              else if (currentStep === 'review') draft.setResolution(null);
-            }}
+            onClick={() => goTo(stepIndex - 1)}
+            disabled={submission.isPending}
           >
             Back
           </Button>
         )}
-        {currentStep !== 'review' && (
-          <Button
-            onClick={handleNext}
-            disabled={
-              (currentStep === 'items' && draft.selectedCount === 0) ||
-              (currentStep === 'reason' && !draft.draft.reason)
-            }
-          >
-            Next
-          </Button>
-        )}
-        {currentStep === 'review' && (
+        {isLastStep ? (
           <Button
             onClick={handleSubmit}
-            loading={isSubmitting}
-            disabled={!isCurrentStepValid}
+            loading={submission.isPending}
+            disabled={!canAdvance}
           >
             Submit return
           </Button>
+        ) : (
+          <Button onClick={() => goTo(stepIndex + 1)} disabled={!canAdvance}>
+            Next
+          </Button>
+        )}
+        {!canAdvance && step.blockedHint && (
+          <p className="text-sm text-muted" aria-live="polite">
+            {step.blockedHint}
+          </p>
         )}
       </div>
     </section>

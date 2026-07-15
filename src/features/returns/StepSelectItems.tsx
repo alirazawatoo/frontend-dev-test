@@ -1,7 +1,7 @@
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import { ItemThumb } from '../../components';
-import { formatMoney } from '../../lib';
-import type { Order, ReturnDraft } from '../../types';
+import { formatMoney, returnedValueCents } from '../../lib';
+import type { Order, OrderItem, ReturnDraft } from '../../types';
 
 type StepSelectItemsProps = {
   order: Order;
@@ -9,11 +9,10 @@ type StepSelectItemsProps = {
   onQuantityChange: (itemId: string, quantity: number) => void;
 };
 
-const QUANTITY_LIMITS = [0, 1, 2, 3, 4, 5];
-
 /**
  * Step 1: Select returnable items and quantities.
- * Only shows items marked returnEligible; caps qty at ordered qty.
+ * Quantity options stop at the ordered quantity; non-returnable lines stay
+ * visible but disabled so the shopper can see why they are missing.
  */
 export const StepSelectItems = memo(function StepSelectItems({
   order,
@@ -22,73 +21,71 @@ export const StepSelectItems = memo(function StepSelectItems({
 }: StepSelectItemsProps) {
   const returnableItems = order.items.filter((item) => item.returnEligible);
   const selectedCount = Object.values(draft.selections).reduce((sum, qty) => sum + qty, 0);
+  const returnedValue = returnedValueCents(returnableItems, draft.selections);
 
-  const returnedValue =
-    returnableItems.reduce((sum, item) => {
-      const qty = draft.selections[item.id] ?? 0;
-      return sum + item.unitPriceCents * qty;
-    }, 0) / 100;
+  if (returnableItems.length === 0) {
+    return <p className="text-sm text-muted">None of the items in this order are returnable.</p>;
+  }
 
   return (
     <div className="space-y-4">
-      {returnableItems.length === 0 ? (
-        <p className="text-sm text-muted">None of the items in this order are returnable.</p>
-      ) : (
-        <>
-          <ul className="space-y-3">
-            {returnableItems.map((item) => (
-              <ItemRow
-                key={item.id}
-                item={item}
-                selectedQty={draft.selections[item.id] ?? 0}
-                onQuantityChange={onQuantityChange}
-              />
-            ))}
-          </ul>
+      <ul className="space-y-3">
+        {order.items.map((item) => (
+          <ItemRow
+            key={item.id}
+            item={item}
+            selectedQty={draft.selections[item.id] ?? 0}
+            onQuantityChange={onQuantityChange}
+          />
+        ))}
+      </ul>
 
-          <div className="rounded-lg border border-line bg-canvas px-3 py-2">
-            <p className="flex items-center justify-between text-sm">
-              <span className="text-muted">
-                {selectedCount} {selectedCount === 1 ? 'item' : 'items'} selected
-              </span>
-              <span className="font-semibold text-ink">
-                {formatMoney(Math.round(returnedValue * 100))}
-              </span>
-            </p>
-          </div>
-        </>
-      )}
+      <div className="rounded-lg border border-line bg-canvas px-3 py-2">
+        <p className="flex items-center justify-between text-sm" aria-live="polite">
+          <span className="text-muted">
+            {selectedCount} {selectedCount === 1 ? 'item' : 'items'} selected
+          </span>
+          <span className="font-semibold text-ink">{formatMoney(returnedValue)}</span>
+        </p>
+      </div>
     </div>
   );
 });
 
-const ItemRow = memo(function ItemRow({ item, selectedQty, onQuantityChange }: any) {
-  const handleChange = useCallback(
-    (value: string) => {
-      onQuantityChange(item.id, parseInt(value, 10));
-    },
-    [item.id, onQuantityChange],
-  );
+type ItemRowProps = {
+  item: OrderItem;
+  selectedQty: number;
+  onQuantityChange: (itemId: string, quantity: number) => void;
+};
+
+const ItemRow = memo(function ItemRow({ item, selectedQty, onQuantityChange }: ItemRowProps) {
+  const quantities = Array.from({ length: item.quantity + 1 }, (_, n) => n);
 
   return (
-    <li className="flex items-center gap-3">
+    <li className="flex flex-wrap items-center gap-3">
       <ItemThumb name={item.name} color={item.thumbColor} />
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-ink">{item.name}</p>
-        <p className="text-sm text-muted">{formatMoney(item.unitPriceCents)} each</p>
+        <p className="text-sm text-muted">
+          {formatMoney(item.unitPriceCents)} each · {item.quantity} ordered
+        </p>
       </div>
-      <select
-        value={selectedQty}
-        onChange={(e) => handleChange(e.target.value)}
-        aria-label={`Return quantity for ${item.name}`}
-        className="h-9 rounded-lg border border-line bg-surface px-2 text-sm text-ink focus:border-accent focus:outline-none"
-      >
-        {QUANTITY_LIMITS.map((n) => (
-          <option key={n} value={n} disabled={n > item.quantity}>
-            {n > 0 ? `Return ${n}` : 'Return none'}
-          </option>
-        ))}
-      </select>
+      {item.returnEligible ? (
+        <select
+          value={selectedQty}
+          onChange={(e) => onQuantityChange(item.id, Number(e.target.value))}
+          aria-label={`Return quantity for ${item.name}`}
+          className="h-9 rounded-lg border border-line bg-surface px-2 text-sm text-ink focus:border-accent focus:outline-none"
+        >
+          {quantities.map((n) => (
+            <option key={n} value={n}>
+              {n > 0 ? `Return ${n}` : 'Return none'}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <span className="text-sm text-muted">Not returnable</span>
+      )}
     </li>
   );
 });
