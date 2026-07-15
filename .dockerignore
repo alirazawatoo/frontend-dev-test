@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.git
+.github
+*.log
+.env
+.env.*
+docs
+CANDIDATE_BRIEF.pdf
+Dockerfile
+.dockerignore
