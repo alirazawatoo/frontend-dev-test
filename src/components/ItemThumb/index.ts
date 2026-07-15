@@ -1,0 +1,1 @@
+export { ItemThumb } from './ItemThumb';
