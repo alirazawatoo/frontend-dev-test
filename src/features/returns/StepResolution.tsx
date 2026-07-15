@@ -29,14 +29,17 @@ export const StepResolution = memo(function StepResolution({
           const bonus = storeCreditBonusCents(returnedValue, option.value);
 
           return (
-            <label key={option.value} className="flex cursor-pointer items-start gap-3">
+            <label
+              key={option.value}
+              className="flex cursor-pointer items-start gap-3 rounded-lg border border-line p-3 transition-colors hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent"
+            >
               <input
                 type="radio"
                 name="resolution"
                 value={option.value}
                 checked={draft.resolution === option.value}
                 onChange={(e) => onResolutionChange(e.target.value as ReturnResolution)}
-                className="mt-1"
+                className="mt-1 accent-[var(--accent-deep)] focus-visible:outline-none"
               />
               <div className="flex-1">
                 <p className="font-medium text-ink">{option.title}</p>

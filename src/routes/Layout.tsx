@@ -6,6 +6,12 @@ import { Spinner } from '../components';
 export function Layout() {
   return (
     <div className="flex flex-col min-h-screen bg-canvas">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-ink"
+      >
+        Skip to content
+      </a>
       <header className="border-b border-line bg-surface px-4 py-4 sm:px-6">
         <div className="mx-auto max-w-4xl">
           <Link to="/" className="inline-block">
@@ -18,7 +24,7 @@ export function Layout() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 py-8 sm:px-6">
+      <main id="main" tabIndex={-1} className="flex-1 px-4 py-8 focus:outline-none sm:px-6">
         <div className="mx-auto max-w-4xl">
           <Suspense fallback={<LoadingFallback />}>
             <Outlet />

@@ -3,6 +3,8 @@ import { Field, Select, Textarea } from '../../components';
 import { RETURN_REASONS } from '../../lib';
 import type { ReturnDraft } from '../../types';
 
+const COMMENT_MAX_LENGTH = 500;
+
 type StepReasonProps = {
   draft: ReturnDraft;
   onReasonChange: (reason: string) => void;
@@ -39,13 +41,18 @@ export const StepReason = memo(function StepReason({
         </Select>
       </Field>
 
-      <Field label="Comments (optional)" htmlFor={commentId}>
+      <Field
+        label="Comments (optional)"
+        htmlFor={commentId}
+        hint={`${draft.comment.length}/${COMMENT_MAX_LENGTH} characters`}
+      >
         <Textarea
           id={commentId}
           value={draft.comment}
           onChange={(e) => onCommentChange(e.target.value)}
-          placeholder="Tell us more..."
+          placeholder="Anything that helps us sort it out quickly"
           rows={4}
+          maxLength={COMMENT_MAX_LENGTH}
         />
       </Field>
     </div>
