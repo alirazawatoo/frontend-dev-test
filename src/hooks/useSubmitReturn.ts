@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { submitReturn } from '@/services';
-import type { ReturnReceipt, ReturnRequest } from '@/types';
+import { submitReturn } from '../services';
+import type { ReturnReceipt, ReturnRequest } from '../types';
 
 /**
  * Submits a return request.

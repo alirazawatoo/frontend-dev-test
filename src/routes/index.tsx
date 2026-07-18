@@ -1,12 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router-dom';
-import { Spinner } from '@/components';
-import { OrdersPage, OrderDetailPage } from '@/features/orders';
-import { ReturnFlowPage } from '@/features/returns';
+import { Spinner } from '../components';
+import { OrdersPage, OrderDetailPage } from '../features/orders';
 
 // Lazy-load the return flow so its bundle isn't included until needed.
 const ReturnFlowPageLazy = lazy(() =>
-  import('@/features/returns').then((m) => ({ default: m.ReturnFlowPage })),
+  import('../features/returns').then((m) => ({ default: m.ReturnFlowPage })),
 );
 
 /** The app shell layout. Every route renders inside this. */

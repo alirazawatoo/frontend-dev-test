@@ -1,5 +1,5 @@
 import { memo, type ReactNode } from 'react';
-import { cn } from '@/lib';
+import { cn } from '../../lib';
 
 type BadgeProps = {
   children: ReactNode;

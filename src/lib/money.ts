@@ -1,4 +1,4 @@
-import type { Order, OrderItem, ReturnResolution } from '@/types';
+import type { Order, OrderItem, ReturnResolution } from '../types';
 import { STORE_CREDIT_BONUS } from './constants';
 
 /**
@@ -22,7 +22,7 @@ export function lineTotalCents(unitPriceCents: number, quantity: number): number
 
 /** Sum of every line in an order (in cents). */
 export function orderTotalCents(order: Order): number {
-  return order.items.reduce(
+  return order.items.reduce<number>(
     (sum, item) => sum + lineTotalCents(item.unitPriceCents, item.quantity),
     0,
   );

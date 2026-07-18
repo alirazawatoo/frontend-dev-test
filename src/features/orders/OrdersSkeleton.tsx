@@ -1,5 +1,5 @@
-import { Skeleton } from '@/components';
-import { PAGE_SIZE } from '@/lib';
+import { Skeleton } from '../../components';
+import { PAGE_SIZE } from '../../lib';
 
 /** Placeholder cards shown while the first page of orders loads. */
 export function OrdersSkeleton() {

@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Button, ErrorState, Spinner, Stepper } from '@/components';
-import { useOrder, useReturnDraft, useSubmitReturn } from '@/hooks';
-import { cn, returnedValueCents } from '@/lib';
-import type { ReturnRequest, ReturnStep } from '@/types';
+import { Button, ErrorState, Spinner, Stepper } from '../../components';
+import { useOrder, useReturnDraft, useSubmitReturn } from '../../hooks';
+import { cn, returnedValueCents } from '../../lib';
+import type { ReturnRequest, ReturnStep } from '../../types';
 import { StepSelectItems } from './StepSelectItems';
 import { StepReason } from './StepReason';
 import { StepResolution } from './StepResolution';
@@ -56,7 +56,7 @@ export function ReturnFlowPage() {
     if (!order || !isCurrentStepValid) return;
 
     const returnableItems = order.items.filter((item) => item.returnEligible);
-    const value = returnedValueCents(returnableItems, draft.draft.selections);
+    returnedValueCents(returnableItems, draft.draft.selections);
 
     const request: ReturnRequest = {
       orderId: order.id,
@@ -158,7 +158,7 @@ export function ReturnFlowPage() {
           submitError && 'ring-1 ring-danger',
         )}
       >
-        {currentStep === 'items' && (
+        {currentStep === 'items' && order && (
           <StepSelectItems
             order={order}
             draft={draft.draft}
@@ -172,14 +172,14 @@ export function ReturnFlowPage() {
             onCommentChange={draft.setComment}
           />
         )}
-        {currentStep === 'resolution' && (
+        {currentStep === 'resolution' && order && (
           <StepResolution
             order={order}
             draft={draft.draft}
             onResolutionChange={draft.setResolution}
           />
         )}
-        {currentStep === 'review' && <StepReview order={order} draft={draft.draft} />}
+        {currentStep === 'review' && order && <StepReview order={order} draft={draft.draft} />}
       </div>
 
       {submitError && (

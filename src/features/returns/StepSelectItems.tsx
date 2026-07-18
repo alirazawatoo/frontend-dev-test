@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
-import { ItemThumb } from '@/components';
-import { formatMoney } from '@/lib';
-import type { Order, ReturnDraft } from '@/types';
+import { ItemThumb } from '../../components';
+import { formatMoney } from '../../lib';
+import type { Order, ReturnDraft } from '../../types';
 
 type StepSelectItemsProps = {
   order: Order;

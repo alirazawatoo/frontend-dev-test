@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { listOrders, orderKeys, type OrdersQuery } from '@/services';
+import { listOrders, orderKeys, type OrdersQuery } from '../services';
 
 /**
  * Fetches a page of orders for the dashboard.

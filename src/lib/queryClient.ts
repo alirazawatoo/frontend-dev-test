@@ -1,12 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
-import { ApiError } from '@/services/mockApi';
+import { ApiError } from '../services/mockApi';
 
 /** Don't waste retries on errors that won't change on their own. */
 function isTerminalError(error: unknown): boolean {
   // Aborted requests are intentional (navigation / new query) — never retry.
-  if (error instanceof DOMException && error.name === 'AbortError') return true;
+  if (error instanceof DOMException && (error as DOMException).name === 'AbortError') return true;
   // 404 (not found) and 422 (validation) are deterministic — retrying won't help.
-  if (error instanceof ApiError) return error.status === 404 || error.status === 422;
+  if (error instanceof ApiError) return (error as ApiError).status === 404 || (error as ApiError).status === 422;
   return false;
 }
 

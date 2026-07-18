@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
-import { Button } from '@/components';
-import type { ReturnReceipt } from '@/types';
+import { Button } from '../../components';
+import type { ReturnReceipt } from '../../types';
 
 type SuccessScreenProps = {
   receipt: ReturnReceipt;

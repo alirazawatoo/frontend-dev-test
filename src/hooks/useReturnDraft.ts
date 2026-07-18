@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useReducer } from 'react';
-import type { ReturnDraft, ReturnResolution } from '@/types';
+import type { ReturnDraft, ReturnResolution } from '../types';
 
 const initialDraft: ReturnDraft = {
   selections: {},
@@ -12,7 +12,7 @@ type DraftAction =
   | { type: 'setQuantity'; itemId: string; quantity: number }
   | { type: 'setReason'; reason: string }
   | { type: 'setComment'; comment: string }
-  | { type: 'setResolution'; resolution: ReturnResolution }
+  | { type: 'setResolution'; resolution: ReturnResolution | null }
   | { type: 'reset' };
 
 function draftReducer(state: ReturnDraft, action: DraftAction): ReturnDraft {
@@ -59,7 +59,7 @@ export function useReturnDraft() {
     dispatch({ type: 'setComment', comment });
   }, []);
 
-  const setResolution = useCallback((resolution: ReturnResolution) => {
+  const setResolution = useCallback((resolution: ReturnResolution | null) => {
     dispatch({ type: 'setResolution', resolution });
   }, []);
 

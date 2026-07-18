@@ -1,8 +1,6 @@
 import { memo, useMemo } from 'react';
-import { cn } from '@/lib';
-import { RESOLUTION_OPTIONS, resolutionAmountCents, returnedValueCents, storeCreditBonusCents, formatMoney } from '@/lib';
-import { STORE_CREDIT_BONUS } from '@/lib';
-import type { Order, ReturnDraft, ReturnResolution } from '@/types';
+import { RESOLUTION_OPTIONS, resolutionAmountCents, returnedValueCents, storeCreditBonusCents, formatMoney } from '../../lib';
+import type { Order, ReturnDraft, ReturnResolution } from '../../types';
 
 type StepResolutionProps = {
   order: Order;

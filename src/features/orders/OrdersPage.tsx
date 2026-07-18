@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PackageSearch } from 'lucide-react';
-import { Button, EmptyState, ErrorState } from '@/components';
-import { useDebouncedValue, useOrders } from '@/hooks';
-import { PAGE_SIZE, SEARCH_DEBOUNCE_MS, cn } from '@/lib';
-import type { StatusFilter } from '@/types';
+import { Button, EmptyState, ErrorState } from '../../components';
+import { useDebouncedValue, useOrders } from '../../hooks';
+import { PAGE_SIZE, SEARCH_DEBOUNCE_MS, cn } from '../../lib';
+import type { StatusFilter } from '../../types';
 import { OrderCard } from './OrderCard';
 import { OrdersSkeleton } from './OrdersSkeleton';
 import { Pagination } from './Pagination';

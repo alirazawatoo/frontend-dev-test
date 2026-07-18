@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
-import { Button, ErrorState, ItemThumb, Skeleton } from '@/components';
-import { useOrder } from '@/hooks';
-import { formatDate, formatMoney, lineTotalCents, orderTotalCents } from '@/lib';
-import type { Order } from '@/types';
+import { Button, ErrorState, ItemThumb, Skeleton } from '../../components';
+import { useOrder } from '../../hooks';
+import { formatDate, formatMoney, lineTotalCents, orderTotalCents } from '../../lib';
+import type { Order } from '../../types';
 import { StatusBadge } from './StatusBadge';
 
 /** Order detail: line items, total, and (for delivered orders) a return CTA. */

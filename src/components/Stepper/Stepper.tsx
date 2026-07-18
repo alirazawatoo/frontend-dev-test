@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react';
-import { cn } from '@/lib';
+import { cn } from '../../lib';
 
 export type Step = {
   key: string;

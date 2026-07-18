@@ -1,5 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
-import { getErrorMessage } from '@/lib';
+import { getErrorMessage } from '../../lib';
 import { Button } from '../Button';
 
 type ErrorStateProps = {

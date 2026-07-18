@@ -1,6 +1,6 @@
-import { Select } from '@/components';
-import { STATUS_FILTERS } from '@/lib';
-import type { StatusFilter } from '@/types';
+import { Select } from '../../components';
+import { STATUS_FILTERS } from '../../lib';
+import type { StatusFilter } from '../../types';
 
 type StatusFilterSelectProps = {
   value: StatusFilter;

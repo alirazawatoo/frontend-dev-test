@@ -1,9 +1,9 @@
 import { memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { ItemThumb } from '@/components';
-import { formatDate, formatMoney, orderTotalCents } from '@/lib';
-import type { Order } from '@/types';
+import { ItemThumb } from '../../components';
+import { formatDate, formatMoney, orderTotalCents } from '../../lib';
+import type { Order } from '../../types';
 import { StatusBadge } from './StatusBadge';
 
 /** A single order in the dashboard list. Memoized — the list re-renders often. */

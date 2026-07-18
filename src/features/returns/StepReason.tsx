@@ -1,7 +1,7 @@
 import { memo } from 'react';
-import { Field, Select, Textarea } from '@/components';
-import { RETURN_REASONS, useFieldId } from '@/lib';
-import type { ReturnDraft } from '@/types';
+import { Field, Select, Textarea } from '../../components';
+import { RETURN_REASONS, useFieldId } from '../../lib';
+import type { ReturnDraft } from '../../types';
 
 type StepReasonProps = {
   draft: ReturnDraft;

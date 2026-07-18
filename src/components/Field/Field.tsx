@@ -5,7 +5,7 @@ import {
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react';
-import { cn } from '@/lib';
+import { cn } from '../../lib';
 
 const controlClasses =
   'w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink ' +

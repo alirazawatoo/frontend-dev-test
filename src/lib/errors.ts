@@ -1,4 +1,4 @@
-import { ApiError } from '@/services';
+import { ApiError } from '../services/mockApi';
 
 /** Turn any thrown value into a shopper-friendly message. */
 export function getErrorMessage(error: unknown): string {

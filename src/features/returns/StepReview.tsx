@@ -1,8 +1,8 @@
 import { memo, useMemo } from 'react';
-import { ItemThumb } from '@/components';
-import { formatMoney, lineTotalCents, resolutionAmountCents, returnedValueCents } from '@/lib';
-import { RESOLUTION_OPTIONS } from '@/lib';
-import type { Order, ReturnDraft } from '@/types';
+import { ItemThumb } from '../../components';
+import { formatMoney, lineTotalCents, resolutionAmountCents, returnedValueCents } from '../../lib';
+import { RESOLUTION_OPTIONS } from '../../lib';
+import type { Order, ReturnDraft } from '../../types';
 
 type StepReviewProps = {
   order: Order;

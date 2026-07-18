@@ -11,7 +11,7 @@ export type {
   OrderItem,
   OrderStatus,
   Page,
-} from '@/services/mockApi';
+} from '../services/mockApi';
 
 /** The status filter shown in the dashboard — every status plus an "all" option. */
-export type StatusFilter = import('@/services/mockApi').OrderStatus | 'all';
+export type StatusFilter = import('../services/mockApi').OrderStatus | 'all';

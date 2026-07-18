@@ -1,4 +1,4 @@
-import type { OrderStatus, ReturnResolution, StatusFilter } from '@/types';
+import type { OrderStatus, ReturnResolution, StatusFilter } from '../types';
 
 /** Orders per page in the dashboard. Matches the mock API's default page size. */
 export const PAGE_SIZE = 4;

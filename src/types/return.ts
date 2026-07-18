@@ -9,7 +9,9 @@ export type {
   ReturnRequest,
   ReturnReceipt,
   ReturnResolution,
-} from '@/services/mockApi';
+} from '../services/mockApi';
+
+import type { ReturnResolution } from '../services/mockApi';
 
 /** A single selected line in the return draft: how many of an item to send back. */
 export type ReturnSelection = {
@@ -29,5 +31,5 @@ export type ReturnDraft = {
   selections: Record<string, number>;
   reason: string;
   comment: string;
-  resolution: import('@/services/mockApi').ReturnResolution | null;
+  resolution: ReturnResolution | null;
 };
