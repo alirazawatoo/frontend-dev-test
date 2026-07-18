@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib';
 
@@ -10,6 +10,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: ButtonSize;
   /** Shows a spinner and disables the button. */
   loading?: boolean;
+  /** Render as a Link or other element without changing styles. */
+  asChild?: boolean;
+  /** When asChild=true, this is passed as the child wrapper. */
+  children?: ReactNode;
 };
 
 const VARIANTS: Record<ButtonVariant, string> = {
@@ -29,25 +33,46 @@ const SIZES: Record<ButtonSize, string> = {
 /** App-wide button. Handles variants, sizing, and an inline loading state. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { variant = 'primary', size = 'md', loading = false, disabled, className, children, ...props },
+    {
+      variant = 'primary',
+      size = 'md',
+      loading = false,
+      disabled,
+      asChild = false,
+      className,
+      children,
+      ...props
+    },
     ref,
-  ) => (
-    <button
-      ref={ref}
-      disabled={disabled || loading}
-      className={cn(
-        'inline-flex items-center justify-center rounded-lg font-medium',
-        'transition-colors disabled:cursor-not-allowed disabled:opacity-60',
-        SIZES[size],
-        VARIANTS[variant],
-        className,
-      )}
-      {...props}
-    >
-      {loading && <Loader2 className="size-4 animate-spin" aria-hidden />}
-      {children}
-    </button>
-  ),
+  ) => {
+    const classes = cn(
+      'inline-flex items-center justify-center rounded-lg font-medium',
+      'transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+      SIZES[size],
+      VARIANTS[variant],
+      className,
+    );
+
+    if (asChild) {
+      return (
+        <span className={classes}>
+          {children}
+        </span>
+      );
+    }
+
+    return (
+      <button
+        ref={ref}
+        disabled={disabled || loading}
+        className={classes}
+        {...props}
+      >
+        {loading && <Loader2 className="size-4 animate-spin" aria-hidden />}
+        {children}
+      </button>
+    );
+  },
 );
 
 Button.displayName = 'Button';
