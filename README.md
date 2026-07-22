@@ -2,6 +2,8 @@
 
 A React and TypeScript take-home project that models the customer journey after checkout: find an order, inspect its details, and complete a guided return or exchange. The application uses an in-memory service layer so the UI states and business rules can be reviewed without a backend.
 
+![Orders dashboard with search, status filtering and order cards](docs/screenshots/orders-dashboard.png)
+
 ## Product walkthrough
 
 The orders dashboard supports status filtering, text search and pagination. Delivered orders lead into a four-step return flow:
@@ -12,6 +14,10 @@ The orders dashboard supports status filtering, text search and pagination. Deli
 4. Review the request before submitting it.
 
 Quantities cannot exceed the original order, non-returnable items remain disabled, and store credit includes the configured 10% bonus. Reads may retry transient failures; return submissions require an explicit retry to avoid silently duplicating a write.
+
+| Order details | Guided return flow |
+| --- | --- |
+| ![Delivered order details and return action](docs/screenshots/order-detail.png) | ![Return flow item-selection step](docs/screenshots/return-flow.png) |
 
 ```mermaid
 flowchart LR
@@ -64,7 +70,7 @@ npm run test
 npm run build
 ```
 
-The commands are documented from the repository configuration; this portfolio review did not install dependencies or execute them.
+The repository was verified locally with Node.js 20.20.2 and npm 10.8.2. Type checking and the production build passed, all 22 Vitest cases passed, and lint completed with four non-blocking Fast Refresh warnings. npm also reports that `@testing-library/jest-dom@7` targets Node.js 22 or newer, so Node.js 22 is the recommended runtime for a clean install.
 
 ## Correctness choices
 
